@@ -10,7 +10,6 @@ namespace crypto::symmetric {
         void encryptBlock(ConstBytesSpan src, BytesSpan dst) override;
         void decryptBlock(ConstBytesSpan src, BytesSpan dst) override;
     private:
-
         std::array<uint64_t, 16> subKeys;
         void generateSubKeys(uint64_t key64);
     };

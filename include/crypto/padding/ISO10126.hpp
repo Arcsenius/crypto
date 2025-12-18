@@ -6,14 +6,12 @@ namespace crypto::padding {
     public:
         void addPadding(Bytes& data, size_t blockSize) override {
             size_t paddingSize = blockSize - (data.size() % blockSize);
-
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_int_distribution<> dis(0, 255);
             for (size_t i = 0; i < paddingSize - 1; ++i) {
                 data.push_back(static_cast<Byte>(dis(gen)));
             }
-
             data.push_back(static_cast<Byte>(paddingSize));
         }
         size_t removePadding(ConstBytesSpan data, size_t blockSize) override {

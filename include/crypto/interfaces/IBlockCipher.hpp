@@ -7,7 +7,6 @@ namespace crypto {
         virtual ~IBlockCipher() = default;
         [[nodiscard]] virtual size_t getBlockSize() const = 0;
         [[nodiscard]] virtual size_t getKeySize() const = 0;
-
         virtual void encryptBlock(ConstBytesSpan src, BytesSpan dst) = 0;
         virtual void decryptBlock(ConstBytesSpan src, BytesSpan dst) = 0;
     };

@@ -5,7 +5,6 @@ namespace crypto::symmetric {
     class TripleDES : public IBlockCipher {
         DES des1, des2, des3;
     public:
-
         explicit TripleDES(ConstBytesSpan key)
             : des1(key.subspan(0, 8)),
               des2(key.subspan(8, 8)),

@@ -5,16 +5,11 @@ namespace crypto::modes {
     class CTR : public ICipherMode {
         Bytes iv;
     public:
-
-
-
-
         CTR(std::unique_ptr<IBlockCipher> c, ConstBytesSpan iv_)
             : ICipherMode(std::move(c), nullptr), iv(iv_.begin(), iv_.end())
         {
              if (iv.size() != cipher->getBlockSize()) throw std::invalid_argument("IV size mismatch");
         }
-
         Bytes process(ConstBytesSpan input) {
             Bytes result(input.begin(), input.end());
             size_t bs = cipher->getBlockSize();
@@ -22,7 +17,6 @@ namespace crypto::modes {
             std::vector<size_t> indices(blockCount);
             std::iota(indices.begin(), indices.end(), 0);
             std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t i) {
-
                 uint64_t counterVal = utils::BitUtils::bytesToUInt64(iv);
                 counterVal += i;
                 Bytes ctrBlock(bs);

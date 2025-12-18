@@ -10,15 +10,11 @@ namespace crypto::modes {
         Bytes encrypt(ConstBytesSpan input) override {
             Bytes data(input.begin(), input.end());
             size_t bs = cipher->getBlockSize();
-
             padding->addPadding(data, bs);
             Bytes result(data.size());
             size_t blockCount = data.size() / bs;
-
-
             std::vector<size_t> indices(blockCount);
             std::iota(indices.begin(), indices.end(), 0);
-
             std::for_each(std::execution::par, indices.begin(), indices.end(),
                 [&](size_t i) {
                     size_t offset = i * bs;
@@ -34,7 +30,6 @@ namespace crypto::modes {
              if (input.size() % bs != 0) throw std::invalid_argument("Invalid data size for decryption");
              Bytes result(input.size());
              size_t blockCount = input.size() / bs;
-
              std::vector<size_t> indices(blockCount);
              std::iota(indices.begin(), indices.end(), 0);
              std::for_each(std::execution::par, indices.begin(), indices.end(),
@@ -45,7 +40,6 @@ namespace crypto::modes {
                         std::span{result.data() + offset, bs}
                     );
                 });
-
              size_t validSize = padding->removePadding(result, bs);
              result.resize(validSize);
              return result;

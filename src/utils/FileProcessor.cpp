@@ -11,14 +11,8 @@ namespace crypto::utils {
         if (!std::filesystem::exists(inPath)) {
             throw std::runtime_error("Input file not found: " + inPath.string());
         }
-
-
-
-
-
         std::ifstream inFile(inPath, std::ios::binary | std::ios::ate);
         if (!inFile) throw std::runtime_error("Cannot open input file");
-
         std::streamsize size = inFile.tellg();
         inFile.seekg(0, std::ios::beg);
         Bytes buffer(size);

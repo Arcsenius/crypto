@@ -11,13 +11,11 @@ namespace crypto::padding {
         }
         size_t removePadding(ConstBytesSpan data, size_t blockSize) override {
             if (data.empty()) throw std::runtime_error("Empty data");
-
             Byte lastByte = data.back();
             size_t paddingSize = static_cast<size_t>(lastByte);
             if (paddingSize == 0 || paddingSize > blockSize) {
                 throw std::runtime_error("Invalid PKCS7 padding size");
             }
-
             size_t dataSize = data.size();
             for (size_t i = 0; i < paddingSize; ++i) {
                 if (data[dataSize - 1 - i] != lastByte) {

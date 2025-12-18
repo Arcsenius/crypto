@@ -10,9 +10,7 @@ namespace crypto {
     public:
         ICipherMode(std::unique_ptr<IBlockCipher> c, std::unique_ptr<IPadding> p)
             : cipher(std::move(c)), padding(std::move(p)) {}
-
         virtual ~ICipherMode() = default;
-
         virtual Bytes encrypt(ConstBytesSpan data) = 0;
         virtual Bytes decrypt(ConstBytesSpan data) = 0;
     };

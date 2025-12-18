@@ -5,8 +5,6 @@
 #include <memory>
 namespace crypto::symmetric {
     class DEAL : public IBlockCipher {
-
-
         std::vector<std::unique_ptr<DES>> roundDes;
     public:
         explicit DEAL(ConstBytesSpan key);

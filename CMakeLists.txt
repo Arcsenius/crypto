@@ -25,7 +25,6 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# === ПОДПАПКИ ===
 add_subdirectory(src)
 add_subdirectory(apps/lab1)
 add_subdirectory(apps/lab2) # Новая лаба
