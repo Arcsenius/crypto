@@ -1,8 +1,15 @@
-//
-// Created by arcsenius on 18.12.2025.
-//
+#pragma once
+#include "crypto/common/types.hpp"
+namespace crypto {
+    class IPadding {
+    public:
+        virtual ~IPadding() = default;
 
-#ifndef CRYPTO_IPADDING_HPP
-#define CRYPTO_IPADDING_HPP
 
-#endif //CRYPTO_IPADDING_HPP
+        virtual void addPadding(Bytes& data, size_t blockSize) = 0;
+
+
+
+        virtual size_t removePadding(ConstBytesSpan data, size_t blockSize) = 0;
+    };
+}

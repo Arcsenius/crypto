@@ -1,8 +1,18 @@
-//
-// Created by arcsenius on 18.12.2025.
-//
+#pragma once
+#include "crypto/symmetric/DES.hpp"
+#include "crypto/utils/BitUtils.hpp"
+#include <vector>
+#include <memory>
+namespace crypto::symmetric {
+    class DEAL : public IBlockCipher {
 
-#ifndef CRYPTO_DEAL_HPP
-#define CRYPTO_DEAL_HPP
 
-#endif //CRYPTO_DEAL_HPP
+        std::vector<std::unique_ptr<DES>> roundDes;
+    public:
+        explicit DEAL(ConstBytesSpan key);
+        size_t getBlockSize() const override { return 16; }
+        size_t getKeySize() const override { return 16; }
+        void encryptBlock(ConstBytesSpan src, BytesSpan dst) override;
+        void decryptBlock(ConstBytesSpan src, BytesSpan dst) override;
+    };
+}

@@ -1,4 +1,5 @@
-add_executable(lab1 main.cpp)
+add_executable(lab1 main.cpp
+)
 
 # Просто линкуем crypto_lib.
 # Пути к хедерам и зависимость TBB подтянутся автоматически!

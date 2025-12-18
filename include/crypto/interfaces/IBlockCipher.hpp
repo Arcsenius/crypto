@@ -1,8 +1,14 @@
-//
-// Created by arcsenius on 18.12.2025.
-//
+#pragma once
+#include "crypto/common/types.hpp"
+#include <vector>
+namespace crypto {
+    class IBlockCipher {
+    public:
+        virtual ~IBlockCipher() = default;
+        [[nodiscard]] virtual size_t getBlockSize() const = 0;
+        [[nodiscard]] virtual size_t getKeySize() const = 0;
 
-#ifndef CRYPTO_IBLOCKCIPHER_HPP
-#define CRYPTO_IBLOCKCIPHER_HPP
-
-#endif //CRYPTO_IBLOCKCIPHER_HPP
+        virtual void encryptBlock(ConstBytesSpan src, BytesSpan dst) = 0;
+        virtual void decryptBlock(ConstBytesSpan src, BytesSpan dst) = 0;
+    };
+}

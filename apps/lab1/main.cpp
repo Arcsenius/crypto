@@ -2,23 +2,44 @@
 #include <string>
 #include <filesystem>
 #include <memory>
-
-// Подключаем наши хедеры
+#include <vector>
+#include <cstring>
+#include <algorithm>
 #include "crypto/symmetric/DES.hpp"
 #include "crypto/symmetric/TripleDES.hpp"
-// #include "crypto/symmetric/DEAL.hpp" 
-#include "crypto/padding/PKCS7.hpp"
-// #include "crypto/modes/CBC.hpp"
+#include "crypto/symmetric/DEAL.hpp"
 #include "crypto/modes/ECB.hpp"
+#include "crypto/modes/CBC.hpp"
+#include "crypto/modes/CTR.hpp"
+#include "crypto/modes/RandomDelta.hpp"
+#include "crypto/padding/PKCS7.hpp"
+#include "crypto/padding/ANSIX923.hpp"
+#include "crypto/padding/ISO10126.hpp"
+#include "crypto/padding/Zeros.hpp"
 #include "crypto/utils/FileProcessor.hpp"
-
 using namespace crypto;
-
 void printUsage() {
     std::cout << "Usage: lab1 <mode> <algo> <padding> <key> <input_file> <output_file> [enc|dec]\n";
-    std::cout << "Example: lab1 ECB DES PKCS7 mysecretkey data.bin out.bin enc\n";
+    std::cout << "Options:\n";
+    std::cout << "  Modes:   ECB, CBC, CTR, RD (RandomDelta)\n";
+    std::cout << "  Algos:   DES, 3DES, DEAL\n";
+    std::cout << "  Padding: PKCS7, ANSI, ISO, Zeros\n";
+    std::cout << "Example: lab1 CBC DES PKCS7 mysecretkey data.bin out.bin enc\n";
 }
+Bytes prepareKey(const Bytes& rawKey, size_t requiredSize) {
+    Bytes key = rawKey;
+    if (key.size() < requiredSize) {
+        key.resize(requiredSize, Byte{0});
+    } else if (key.size() > requiredSize) {
+        key.resize(requiredSize);
+    }
+    return key;
+}
+Bytes generateIV(size_t size) {
 
+
+    return Bytes(size, Byte{0});
+}
 int main(int argc, char* argv[]) {
     try {
         if (argc != 8) {
@@ -34,50 +55,75 @@ int main(int argc, char* argv[]) {
         std::filesystem::path outFile = argv[6];
         bool encrypt = (std::string(argv[7]) == "enc");
 
-        // 1. Создаем ключ (простая конвертация строки в байты)
-        // В реальности нужен KDF (Key Derivation Function), но для лабы сойдет обрезка/дополнение
-        Bytes keyData;
-        for (char c : keyStr) keyData.push_back(static_cast<Byte>(c));
+        Bytes rawKey;
+        rawKey.reserve(keyStr.size());
+        for (char c : keyStr) rawKey.push_back(static_cast<Byte>(c));
 
-        // 2. Фабрика алгоритма
         std::unique_ptr<IBlockCipher> cipher;
         if (algoStr == "DES") {
-            // DES требует 8 байт
-            keyData.resize(8, Byte{0}); 
-            cipher = std::make_unique<symmetric::DES>(keyData);
+
+            cipher = std::make_unique<symmetric::DES>(prepareKey(rawKey, 8));
         } else if (algoStr == "3DES") {
-             // ...
-             throw std::logic_error("3DES not implemented in this snippet");
+
+            cipher = std::make_unique<symmetric::TripleDES>(prepareKey(rawKey, 24));
+        } else if (algoStr == "DEAL") {
+
+            cipher = std::make_unique<symmetric::DEAL>(prepareKey(rawKey, 16));
         } else {
-            throw std::invalid_argument("Unknown algorithm");
+            throw std::invalid_argument("Unknown algorithm: " + algoStr);
         }
 
-        // 3. Фабрика паддинга
         std::unique_ptr<IPadding> padding;
         if (padStr == "PKCS7") {
-             padding = std::make_unique<padding::PKCS7>();
+            padding = std::make_unique<padding::PKCS7>();
+        } else if (padStr == "ANSI") {
+            padding = std::make_unique<padding::ANSIX923>();
+        } else if (padStr == "ISO") {
+            padding = std::make_unique<padding::ISO10126>();
+        } else if (padStr == "Zeros") {
+            padding = std::make_unique<padding::Zeros>();
+        } else if (padStr == "None") {
+            padding = nullptr;
         } else {
-             // Default or error
-             throw std::invalid_argument("Unknown padding");
+            throw std::invalid_argument("Unknown padding: " + padStr);
         }
 
-        // 4. Фабрика режима
         std::unique_ptr<ICipherMode> mode;
+        size_t blockSize = cipher->getBlockSize();
         if (modeStr == "ECB") {
+            if (!padding) throw std::invalid_argument("ECB requires padding");
             mode = std::make_unique<modes::ECB>(std::move(cipher), std::move(padding));
-        } else {
-            throw std::invalid_argument("Unknown mode");
+        }
+        else if (modeStr == "CBC") {
+            if (!padding) throw std::invalid_argument("CBC requires padding");
+
+            Bytes iv = generateIV(blockSize);
+            mode = std::make_unique<modes::CBC>(std::move(cipher), std::move(padding), iv);
+        }
+        else if (modeStr == "CTR") {
+
+
+
+            Bytes iv = generateIV(blockSize);
+            mode = std::make_unique<modes::CTR>(std::move(cipher), iv);
+        }
+        else if (modeStr == "RD") {
+            if (!padding) throw std::invalid_argument("RandomDelta requires padding");
+
+            Bytes iv = generateIV(4);
+            mode = std::make_unique<modes::RandomDelta>(std::move(cipher), std::move(padding), iv);
+        }
+        else {
+            throw std::invalid_argument("Unknown mode: " + modeStr);
         }
 
-        // 5. Запуск
-        std::cout << "Starting processing...\n";
+        std::cout << "Config: " << algoStr << "/" << modeStr << "/" << padStr << "\n";
+        std::cout << "Operation: " << (encrypt ? "Encrypting" : "Decrypting") << "...\n";
         utils::FileProcessor::process(inFile, outFile, *mode, encrypt);
-        std::cout << "Done! Output saved to " << outFile << "\n";
-
+        std::cout << "Success! Result written to " << outFile << "\n";
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
+        std::cerr << "\n[ERROR] " << e.what() << "\n";
         return -1;
     }
-
     return 0;
 }
