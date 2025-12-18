@@ -27,7 +27,8 @@ FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(src)
 add_subdirectory(apps/lab1)
-add_subdirectory(apps/lab2) # Новая лаба
+add_subdirectory(apps/lab2)
+add_subdirectory(apps/lab6)
 
 enable_testing()
 add_subdirectory(tests)
