@@ -13,6 +13,11 @@
 #include "crypto/padding/ISO10126.hpp"
 #include "crypto/padding/Zeros.hpp"
 #include "crypto/utils/FileProcessor.hpp"
+#include "crypto/modes/PCBC.hpp"
+#include "crypto/modes/CFB.hpp"
+#include "crypto/modes/OFB.hpp"
+
+
 using namespace crypto;
 void printUsage() {
     std::cout << "Usage: lab6 <mode> <padding> <key> <input_file> <output_file> [enc|dec]\n";
@@ -59,11 +64,22 @@ int main(int argc, char* argv[]) {
         else if (padStr == "None") padding = nullptr;
         else throw std::invalid_argument("Unknown padding");
 
+        // 4. Mode
         std::unique_ptr<ICipherMode> mode;
         if (modeStr == "ECB") {
             mode = std::make_unique<modes::ECB>(std::move(cipher), std::move(padding));
         } else if (modeStr == "CBC") {
             mode = std::make_unique<modes::CBC>(std::move(cipher), std::move(padding), generateIV(bs));
+        } else if (modeStr == "PCBC") {
+            // PCBC нужен паддинг
+            if(!padding) throw std::invalid_argument("PCBC needs padding");
+            mode = std::make_unique<modes::PCBC>(std::move(cipher), std::move(padding), generateIV(bs));
+        } else if (modeStr == "CFB") {
+            // CFB может работать с паддингом
+            mode = std::make_unique<modes::CFB>(std::move(cipher), std::move(padding), generateIV(bs));
+        } else if (modeStr == "OFB") {
+            // OFB потоковый, паддинг не нужен (игнорируем или кидаем ошибку)
+            mode = std::make_unique<modes::OFB>(std::move(cipher), generateIV(bs));
         } else if (modeStr == "CTR") {
             mode = std::make_unique<modes::CTR>(std::move(cipher), generateIV(bs));
         } else if (modeStr == "RD") {
