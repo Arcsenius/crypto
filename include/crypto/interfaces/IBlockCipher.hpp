@@ -1,0 +1,8 @@
+//
+// Created by arcsenius on 18.12.2025.
+//
+
+#ifndef CRYPTO_IBLOCKCIPHER_HPP
+#define CRYPTO_IBLOCKCIPHER_HPP
+
+#endif //CRYPTO_IBLOCKCIPHER_HPP
