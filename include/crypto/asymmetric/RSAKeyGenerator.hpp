@@ -7,7 +7,6 @@ namespace crypto::asymmetric {
     };
     class RSAKeyGenerator {
     public:
-
         static RSAKeyPair generate(size_t keySizeBits = 2048);
     };
 }

@@ -21,25 +21,14 @@ int main(int argc, char* argv[]) {
         std::filesystem::path inFile = argv[2];
         std::filesystem::path outFile = argv[3];
         std::string mode = argv[4];
-
-
-
-
-
-
         std::filesystem::path pubPath = "public.key";
         std::filesystem::path privPath = "private.key";
         asymmetric::RSAKeyPair keys;
         if (mode == "gen") {
-
              std::cout << "Generating keys " << keySize << " bits...\n";
              keys = asymmetric::RSAKeyGenerator::generate(keySize);
-
-
              return 0;
         }
-
-
         if (mode == "demo") {
             std::cout << "Generating keys...\n";
             keys = asymmetric::RSAKeyGenerator::generate(keySize);
@@ -52,7 +41,6 @@ int main(int argc, char* argv[]) {
         if (mode == "attack") {
             std::cout << "=== Wiener Attack Demo ===\n";
             std::cout << "1. Generating WEAK keys (vulnerable to Wiener)...\n";
-
             auto weakKeys = asymmetric::WeakKeyGenerator::generateWeak(1024);
             std::cout << "Generated:\n";
             std::cout << "d (secret) = " << weakKeys.priv.d << "\n";

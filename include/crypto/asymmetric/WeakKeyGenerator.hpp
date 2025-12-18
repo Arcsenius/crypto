@@ -4,7 +4,6 @@
 namespace crypto::asymmetric {
     class WeakKeyGenerator {
     public:
-
         static RSAKeyPair generateWeak(size_t keySizeBits = 1024) {
             using math::MathUtils;
             while (true) {
@@ -14,14 +13,8 @@ namespace crypto::asymmetric {
                 if (p < q) std::swap(p, q);
                 BigInt n = p * q;
                 BigInt phi = (p - 1) * (q - 1);
-
-
-
-
                 BigInt d = MathUtils::generatePrime(keySizeBits / 5);
-
                 if (MathUtils::gcd(d, phi) != 1) continue;
-
                 BigInt e = MathUtils::modInverse(d, phi);
                 return RSAKeyPair{ {e, n}, {d, n} };
             }

@@ -7,7 +7,6 @@
 namespace crypto::utils {
     class RSAFileProcessor {
     public:
-
         static void encryptFile(
             const std::filesystem::path& inPath,
             const std::filesystem::path& outPath,
