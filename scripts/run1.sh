@@ -143,7 +143,6 @@ echo -e "${CYAN}=== [LAB 1] Decrypting... ===${NC}"
 # 4. Проверка и Анимация
 if cmp -s "$INPUT_FILE" "$DEC_FILE"; then
 
-    # === ЗАПУСК АНИМАЦИИ ===
     sleep 0.5
     matrix_rain
     decrypt_effect "SUCCESS: SYSTEM SECURITY VERIFIED."

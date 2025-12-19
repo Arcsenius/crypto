@@ -16,8 +16,6 @@
 #include "crypto/modes/PCBC.hpp"
 #include "crypto/modes/CFB.hpp"
 #include "crypto/modes/OFB.hpp"
-
-
 using namespace crypto;
 void printUsage() {
     std::cout << "Usage: lab6 <mode> <padding> <key> <input_file> <output_file> [enc|dec]\n";
@@ -46,16 +44,11 @@ int main(int argc, char* argv[]) {
         std::filesystem::path inFile = argv[4];
         std::filesystem::path outFile = argv[5];
         bool encrypt = (std::string(argv[6]) == "enc");
-
         Bytes rawKey;
         for(char c : keyStr) rawKey.push_back(static_cast<Byte>(c));
-
-
         Bytes key = prepareKey(rawKey, 16);
-
         auto cipher = std::make_unique<symmetric::FROG>(key);
         size_t bs = cipher->getBlockSize();
-
         std::unique_ptr<IPadding> padding;
         if (padStr == "PKCS7") padding = std::make_unique<padding::PKCS7>();
         else if (padStr == "ANSI") padding = std::make_unique<padding::ANSIX923>();
@@ -64,21 +57,20 @@ int main(int argc, char* argv[]) {
         else if (padStr == "None") padding = nullptr;
         else throw std::invalid_argument("Unknown padding");
 
-        // 4. Mode
         std::unique_ptr<ICipherMode> mode;
         if (modeStr == "ECB") {
             mode = std::make_unique<modes::ECB>(std::move(cipher), std::move(padding));
         } else if (modeStr == "CBC") {
             mode = std::make_unique<modes::CBC>(std::move(cipher), std::move(padding), generateIV(bs));
         } else if (modeStr == "PCBC") {
-            // PCBC нужен паддинг
+
             if(!padding) throw std::invalid_argument("PCBC needs padding");
             mode = std::make_unique<modes::PCBC>(std::move(cipher), std::move(padding), generateIV(bs));
         } else if (modeStr == "CFB") {
-            // CFB может работать с паддингом
+
             mode = std::make_unique<modes::CFB>(std::move(cipher), std::move(padding), generateIV(bs));
         } else if (modeStr == "OFB") {
-            // OFB потоковый, паддинг не нужен (игнорируем или кидаем ошибку)
+
             mode = std::make_unique<modes::OFB>(std::move(cipher), generateIV(bs));
         } else if (modeStr == "CTR") {
             mode = std::make_unique<modes::CTR>(std::move(cipher), generateIV(bs));
@@ -87,7 +79,6 @@ int main(int argc, char* argv[]) {
         } else {
             throw std::invalid_argument("Unknown mode");
         }
-
         std::cout << "Running FROG " << modeStr << "...\n";
         utils::FileProcessor::process(inFile, outFile, *mode, encrypt);
         std::cout << "Done.\n";

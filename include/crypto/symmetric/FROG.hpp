@@ -22,7 +22,6 @@ namespace crypto::symmetric {
         std::vector<RoundKey> encryptKeys;
         std::vector<RoundKey> decryptKeys;
         void makeInternalKey(ConstBytesSpan userKey);
-
         void invertKeys();
     };
 }
